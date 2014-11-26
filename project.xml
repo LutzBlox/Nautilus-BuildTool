@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	<name>Nautilus</name>
+	<id>nautilus</id>
+	<version>1.0</version>
+	<settings>
+		<setting name="buildsrc" value="true" />
+		<setting name="leaveprojxml" value="true" />
+		<setting name="logactions" value="true" />
+		<setting name="jrev" value="1.7" />
+	</settings>
+	<class-registry>
+		<class>main.java.com.lutz.nautilus.builders.BuildPhase</class>
+		<class>main.java.com.lutz.nautilus.builders.NautilusBuilder</class>
+		<class>main.java.com.lutz.nautilus.io.FileUtils</class>
+		<class>main.java.com.lutz.nautilus.loggers.BoundLogger</class>
+		<class>main.java.com.lutz.nautilus.loggers.ClockType</class>
+		<class>main.java.com.lutz.nautilus.loggers.Level</class>
+		<class>main.java.com.lutz.nautilus.loggers.Logger</class>
+		<class>main.java.com.lutz.nautilus.loggers.LoggingUtils</class>
+		<class>main.java.com.lutz.nautilus.loggers.Timestamp</class>
+		<class>main.java.com.lutz.nautilus.loggers.Verbosity</class>
+		<class>main.java.com.lutz.nautilus.Nautilus</class>
+		<class>main.java.com.lutz.nautilus.settings.ProjectSettings</class>
+		<class>main.java.com.lutz.nautilus.settings.SettingsEntry</class>
+		<class>main.java.com.lutz.nautilus.settings.SettingsHelper</class>
+		<class>main.java.com.lutz.nautilus.xml.data.ClassEntry</class>
+		<class>main.java.com.lutz.nautilus.xml.data.FileEntry</class>
+		<class>main.java.com.lutz.nautilus.xml.data.ModelEntry</class>
+		<class>main.java.com.lutz.nautilus.xml.data.PackageEntry</class>
+		<class>main.java.com.lutz.nautilus.xml.data.ProjectModel</class>
+		<class>main.java.com.lutz.nautilus.xml.ProjectXML</class>
+		<class>main.java.com.lutz.nautilus.xml.XMLUtils</class>
+	</class-registry>
+	<file-registry>
+		<file>testing.txt</file>
+	</file-registry>
+</project>

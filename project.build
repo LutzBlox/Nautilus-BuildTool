@@ -1,0 +1,12 @@
+<build-params>
+	<build-process>
+		<phase>MOVE_SOURCE</phase>
+		<phase>COMPILE</phase>
+		<phase>PACKAGE_JAR</phase>
+		<phase>GENERATE_SOURCE</phase>
+		<phase>CLEANUP</phase>
+	</build-process>
+	<build-args>
+		<compile-args>-Xms512m -Xmx512m</compile-args>
+	</build-args>
+</build-params>
