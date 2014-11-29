@@ -23,9 +23,9 @@ public final class FileUtils {
 		}
 	}
 
-	public static String getRelativePath(String projectDir, File file) {
+	public static String getRelativePath(String relativeDir, File file) {
 
-		String rootDirectory = projectDir.replace("\\", "/");
+		String rootDirectory = relativeDir.replace("\\", "/");
 
 		if (!rootDirectory.endsWith("/")) {
 
@@ -59,6 +59,30 @@ public final class FileUtils {
 		}
 	}
 
+	public static String removeExtensionKeepPath(File file) {
+
+		String filename = file.getName();
+
+		String dir = file.getAbsolutePath().replace("\\", "/");
+
+		if (dir.contains("/")) {
+
+			dir = dir.substring(0, dir.lastIndexOf("/")) + "/";
+
+		} else {
+
+			dir = "";
+		}
+
+		if (filename.contains(".")) {
+
+			filename = filename.substring(0, filename.lastIndexOf("."));
+
+		}
+
+		return dir + filename;
+	}
+
 	public static void removeDirectory(File file) {
 
 		if (file.isDirectory()) {
@@ -72,11 +96,33 @@ public final class FileUtils {
 		file.delete();
 	}
 
-	public static File[] getFilesFromProjectXML(ProjectXML xml) {
+	public static File[] getMovedSourceFilesForJar(ProjectXML xml) {
 
 		List<File> files = new ArrayList<File>();
 
-		readFilesFromProjectXML(new File(Nautilus.getSourceDirectory()), files);
+		readFilesFromProjectXML(
+				new File(Nautilus.getProjectDirectory()+Nautilus.getNautilusDirectory()
+						+ Nautilus.getTempBuildDirectory()
+						+ Nautilus.getSourceDirectory()), files);
+
+		for (int i = 0; i < files.size(); i++) {
+
+			File f = files.get(i);
+
+			if (getFileExtension(f).equalsIgnoreCase("java")) {
+
+				files.remove(i);
+			}
+		}
+
+		return files.toArray(new File[] {});
+	}
+
+	public static File[] getFilesFromProjectXML(ProjectXML xml) {
+
+		List<File> files = new ArrayList<File>();
+		
+		readFilesFromProjectXML(new File(Nautilus.getProjectDirectory()+Nautilus.getSourceDirectory()), files);
 
 		return files.toArray(new File[] {});
 	}
@@ -98,16 +144,27 @@ public final class FileUtils {
 
 	public static String[] getClassPathsWithPackage(ProjectXML xml) {
 
-		File[] files = getFilesFromProjectXML(xml);
+		File[] files = getMovedSourceFilesForJar(xml);
 
 		List<String> classes = new ArrayList<String>();
 
 		for (File f : files) {
 
-			if (getFileExtension(f).equalsIgnoreCase("java")) {
+			if (getFileExtension(f).equalsIgnoreCase("class")) {
 
-				String fileNoExtension = removeExtension(f);
+				String fileNoExtension = removeExtensionKeepPath(f);
 
+				String relativePath = getRelativePath(
+						Nautilus.getProjectDirectory()
+								+ Nautilus.getNautilusDirectory()
+								+ Nautilus.getTempBuildDirectory()
+								+ Nautilus.getSourceDirectory(), new File(
+								fileNoExtension));
+
+				String classPackage = relativePath.replace("\\", "/").replace(
+						"/", ".");
+
+				classes.add(classPackage);
 			}
 		}
 
@@ -118,7 +175,7 @@ public final class FileUtils {
 			String newSource) {
 
 		String oldSourceFull = new File(oldSource).getAbsolutePath();
-		
+
 		String newSourceFull = new File(newSource).getAbsolutePath();
 
 		String filename = f.getAbsolutePath();
@@ -129,5 +186,31 @@ public final class FileUtils {
 		}
 
 		return new File(filename);
+	}
+
+	public static String getStringURL(String string) {
+
+		try {
+
+			String url = string.replace("\\", "/").replace(" ", "%20");
+
+			if (url.startsWith("/")) {
+
+				if (url.length() > 1) {
+
+					url = url.substring(1);
+
+				} else {
+
+					url = "";
+				}
+			}
+
+			return url;
+
+		} catch (Exception e) {
+
+			return null;
+		}
 	}
 }

@@ -9,8 +9,12 @@
 		<setting name="logactions" value="true" />
 		<setting name="jrev" value="1.7" />
 	</settings>
+	<dependencies>
+		<dependency>C:\Users\Krealutz\Desktop\Java\Build Tool\Nautilus-BuildTool\libs\easyxml.jar</dependency>
+	</dependencies>
 	<class-registry>
 		<class>main.java.com.lutz.nautilus.builders.BuildPhase</class>
+		<class>main.java.com.lutz.nautilus.builders.BuildUtils</class>
 		<class>main.java.com.lutz.nautilus.builders.NautilusBuilder</class>
 		<class>main.java.com.lutz.nautilus.io.FileUtils</class>
 		<class>main.java.com.lutz.nautilus.loggers.BoundLogger</class>
@@ -25,6 +29,8 @@
 		<class>main.java.com.lutz.nautilus.settings.SettingsEntry</class>
 		<class>main.java.com.lutz.nautilus.settings.SettingsHelper</class>
 		<class>main.java.com.lutz.nautilus.xml.data.ClassEntry</class>
+		<class>main.java.com.lutz.nautilus.xml.data.DependencyEntry</class>
+		<class>main.java.com.lutz.nautilus.xml.data.DependencyPackageType</class>
 		<class>main.java.com.lutz.nautilus.xml.data.FileEntry</class>
 		<class>main.java.com.lutz.nautilus.xml.data.ModelEntry</class>
 		<class>main.java.com.lutz.nautilus.xml.data.PackageEntry</class>
@@ -32,7 +38,5 @@
 		<class>main.java.com.lutz.nautilus.xml.ProjectXML</class>
 		<class>main.java.com.lutz.nautilus.xml.XMLUtils</class>
 	</class-registry>
-	<file-registry>
-		<file>testing.txt</file>
-	</file-registry>
+	<file-registry />
 </project>

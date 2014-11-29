@@ -1,5 +1,7 @@
 package main.java.com.lutz.nautilus;
 
+import java.io.File;
+
 import main.java.com.lutz.nautilus.builders.NautilusBuilder;
 import main.java.com.lutz.nautilus.xml.ProjectXML;
 import main.java.com.lutz.nautilus.xml.XMLUtils;
@@ -9,23 +11,38 @@ public class Nautilus {
 	private static String sourceDir = "src/";
 
 	private static String nautilusDir = ".nautilus/";
-	
+
+	private static String nautilusLocDir = "nautilus/";
+
 	private static String buildDir = "builds/";
-	
+
 	private static String buildTempDir = "temp/";
-	
+
+	private static String dependencyDir = "libs/";
+
+	private static String projectDir = "";
+
 	private static final String PROJECT_XML_FILENAME = "project.xml";
 
 	public static void main(String[] args) {
 
-		ProjectXML xml = XMLUtils.generateAndWriteProjectXML("Nautilus", "nautilus", "1.0");
+		if (args.length >= 1) {
+
+			projectDir = args[0];
+		}
+
+		System.setProperty("java.home", getProjectDirectory()
+				+ getNautilusDirectory() + getNautilusLocationDirectory()
+				+ "java/nautilus-jdk-1.7/jre");
+
+		ProjectXML xml = XMLUtils.updateFileReferences();
 
 		NautilusBuilder.runDefaultBuildSequence(xml);
 	}
 
 	public static String getProjectDirectory() {
 
-		String projDir = System.getProperty("user.dir").replace("\\", "/");
+		String projDir = new File(projectDir).getAbsolutePath();
 
 		if (!projDir.endsWith("/")) {
 
@@ -121,6 +138,40 @@ public class Nautilus {
 		}
 
 		return nautilusDir;
+	}
+
+	public static String getNautilusLocationDirectory() {
+
+		nautilusLocDir = nautilusLocDir.replace("\\", "/");
+
+		if (!nautilusLocDir.endsWith("/")) {
+
+			nautilusLocDir += "/";
+		}
+
+		if (nautilusLocDir.startsWith("/")) {
+
+			nautilusLocDir = nautilusLocDir.substring(1);
+		}
+
+		return nautilusLocDir;
+	}
+
+	public static String getDependencyDirectory() {
+
+		dependencyDir = dependencyDir.replace("\\", "/");
+
+		if (!dependencyDir.endsWith("/")) {
+
+			dependencyDir += "/";
+		}
+
+		if (dependencyDir.startsWith("/")) {
+
+			dependencyDir = dependencyDir.substring(1);
+		}
+
+		return dependencyDir;
 	}
 
 	public static String getProjectXMLFilename() {

@@ -8,22 +8,27 @@ public class ProjectModel {
 	private List<ModelEntry> entries = new ArrayList<ModelEntry>();
 
 	private List<FileEntry> fileEntries = new ArrayList<FileEntry>();
-	
-	private String mainClass = null;
 
-	public void addEntry(ModelEntry entry){
-		
+	private List<DependencyEntry> dependencies = new ArrayList<DependencyEntry>();
+
+	public void addEntry(ModelEntry entry) {
+
 		entries.add(entry);
 	}
-	
-	public void addFileEntry(FileEntry entry){
-		
+
+	public void addFileEntry(FileEntry entry) {
+
 		fileEntries.add(entry);
 	}
-	
+
 	public ModelEntry[] getEntries() {
 
 		return entries.toArray(new ModelEntry[] {});
+	}
+
+	public void addDependencyEntry(DependencyEntry entry) {
+
+		dependencies.add(entry);
 	}
 
 	public boolean hasPackageEntry(String name) {
@@ -86,14 +91,9 @@ public class ProjectModel {
 
 		return fileEntries.toArray(new FileEntry[] {});
 	}
-	
-	public void setMainClass(String mainClass){
-		
-		this.mainClass = mainClass;
-	}
-	
-	public String getMainClass(){
-		
-		return mainClass;
+
+	public DependencyEntry[] getDependencyEntries() {
+
+		return dependencies.toArray(new DependencyEntry[] {});
 	}
 }

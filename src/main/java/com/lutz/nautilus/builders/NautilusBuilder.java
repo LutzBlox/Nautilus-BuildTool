@@ -7,7 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 
@@ -22,6 +24,8 @@ import main.java.com.lutz.nautilus.Nautilus;
 import main.java.com.lutz.nautilus.io.FileUtils;
 import main.java.com.lutz.nautilus.loggers.LoggingUtils;
 import main.java.com.lutz.nautilus.xml.ProjectXML;
+import main.java.com.lutz.nautilus.xml.data.DependencyEntry;
+import main.java.com.lutz.nautilus.xml.data.DependencyPackageType;
 
 public class NautilusBuilder {
 
@@ -32,6 +36,8 @@ public class NautilusBuilder {
 		runPhase(BuildPhase.PACKAGE, xml);
 		runPhase(BuildPhase.GEN_SOURCE, xml);
 		runPhase(BuildPhase.CLEANUP, xml);
+
+		LoggingUtils.DEFAULT_LOGGER.log("Build finished!");
 	}
 
 	public static void runPhase(BuildPhase phase, ProjectXML xml,
@@ -75,7 +81,8 @@ public class NautilusBuilder {
 
 		LoggingUtils.DEFAULT_LOGGER.info("Creating temporary build folder...");
 
-		File buildTempFolder = new File(Nautilus.getNautilusDirectory()
+		File buildTempFolder = new File(Nautilus.getProjectDirectory()
+				+ Nautilus.getNautilusDirectory()
 				+ Nautilus.getTempBuildDirectory());
 		buildTempFolder.mkdirs();
 
@@ -83,8 +90,9 @@ public class NautilusBuilder {
 
 		try {
 
-			copySources(new File(Nautilus.getSourceDirectory()),
-					buildTempFolder);
+			copySources(
+					new File(Nautilus.getProjectDirectory()
+							+ Nautilus.getSourceDirectory()), buildTempFolder);
 
 		} catch (Exception e) {
 
@@ -124,14 +132,18 @@ public class NautilusBuilder {
 
 	public static void compile(ProjectXML xml, String... args) {
 
+		LoggingUtils.DEFAULT_LOGGER.log("Compiling classes...");
+
 		File[] files = getFilesToCompile(FileUtils.getFilesFromProjectXML(xml));
 
 		for (int i = 0; i < files.length; i++) {
 
 			files[i] = FileUtils.changeSourceDirectory(
 					files[i],
-					Nautilus.getSourceDirectory(),
-					Nautilus.getNautilusDirectory()
+					Nautilus.getProjectDirectory()
+							+ Nautilus.getSourceDirectory(),
+					Nautilus.getProjectDirectory()
+							+ Nautilus.getNautilusDirectory()
 							+ Nautilus.getTempBuildDirectory()
 							+ Nautilus.getSourceDirectory());
 		}
@@ -149,7 +161,7 @@ public class NautilusBuilder {
 					.getJavaFileObjects(files);
 
 			CompilationTask task = compiler.getTask(null, fileManager,
-					diagnostics, getClasspathArray(files), null,
+					diagnostics, getClasspathArray(xml), null,
 					compilationUnits);
 
 			boolean result = task.call();
@@ -171,14 +183,20 @@ public class NautilusBuilder {
 		}
 	}
 
-	private static List<String> getClasspathArray(File[] files) {
+	private static List<String> getClasspathArray(ProjectXML xml) {
 
 		List<String> args = new ArrayList<String>();
 
 		args.add("-cp");
 
-		String arg = ".;C:\\Users\\Krealutz\\Desktop\\Java\\Build Tool\\Nautilus-BuildTool\\libs\\Nautilus EasyXML.jar";
+		String arg = ".";
 
+		for (DependencyEntry dependency : xml.getProjectModel()
+				.getDependencyEntries()) {
+			
+			arg += ";" + dependency.getPath();
+		}
+		
 		args.add(arg);
 
 		return args;
@@ -203,35 +221,62 @@ public class NautilusBuilder {
 
 		try {
 
-			new File(Nautilus.getNautilusDirectory()
+			new File(Nautilus.getProjectDirectory()
+					+ Nautilus.getNautilusDirectory()
 					+ Nautilus.getBuildDirectory()).mkdirs();
 
 			FileOutputStream fileOutput = new FileOutputStream(new File(
-					Nautilus.getNautilusDirectory()
+					Nautilus.getProjectDirectory()
+							+ Nautilus.getNautilusDirectory()
 							+ Nautilus.getBuildDirectory()
 							+ xml.getProjectName() + "-"
 							+ xml.getProjectVersion() + ".jar"));
 
 			JarOutputStream jarOutput;
 
-			if (xml.getProjectModel().getMainClass() != null) {
+			Manifest manifest = getManifest(xml);
 
-				Manifest manifest = new Manifest();
-
-				manifest.getMainAttributes().put(
-						Attributes.Name.MANIFEST_VERSION, "1.0");
-
-				manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS,
-						xml.getProjectModel().getMainClass());
+			if (manifest != null) {
 
 				jarOutput = new JarOutputStream(fileOutput, manifest);
 
 			} else {
 
-				LoggingUtils.DEFAULT_LOGGER
-						.info("ERROR: The project being built does not have a main class specified (you must do this manually in the project.xml file).  If this is acceptable, you may ignore this message.");
-
 				jarOutput = new JarOutputStream(fileOutput);
+			}
+
+			Map<String, List<String>> files = BuildUtils
+					.formatFileListForJar(FileUtils
+							.getMovedSourceFilesForJar(xml));
+
+			for (String dir : files.keySet()) {
+
+				if (!dir.contentEquals("")) {
+
+					jarOutput.putNextEntry(new JarEntry(dir));
+				}
+
+				for (String name : files.get(dir)) {
+
+					jarOutput.putNextEntry(new JarEntry(dir + name));
+
+					try {
+
+						jarOutput.write(Files.readAllBytes(new File(Nautilus
+								.getProjectDirectory()
+								+ Nautilus.getNautilusDirectory()
+								+ Nautilus.getTempBuildDirectory()
+								+ Nautilus.getSourceDirectory() + dir + name)
+								.toPath()));
+
+					} catch (Exception e) {
+
+						LoggingUtils.DEFAULT_LOGGER
+								.warn("An error occurred while reading data from a file!");
+
+						LoggingUtils.DEFAULT_LOGGER.logException(e);
+					}
+				}
 			}
 
 			jarOutput.close();
@@ -247,6 +292,64 @@ public class NautilusBuilder {
 		}
 	}
 
+	private static Manifest getManifest(ProjectXML xml) {
+
+		Manifest manifest = new Manifest();
+
+		manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION,
+				"1.0");
+
+		manifest.getMainAttributes().put(new Attributes.Name("Created-By"),
+				"Nautilus");
+
+		List<String> classpath = new ArrayList<String>();
+
+		for (DependencyEntry dependency : xml.getProjectModel()
+				.getDependencyEntries()) {
+
+			if (dependency.getPackageType() == DependencyPackageType.EXTERNAL) {
+
+				String classpathEntry = BuildUtils.addJarDependency(dependency
+						.getPath());
+
+				if (classpathEntry != null) {
+
+					classpath.add(classpathEntry);
+				}
+			}
+		}
+
+		String classpathStr = ".";
+
+		for (String c : classpath) {
+
+			classpathStr += " " + c;
+		}
+
+		manifest.getMainAttributes().put(Attributes.Name.CLASS_PATH,
+				classpathStr);
+
+		String mainClass = BuildUtils.getMainClass(
+				new File(Nautilus.getProjectDirectory()
+						+ Nautilus.getNautilusDirectory()
+						+ Nautilus.getTempBuildDirectory()
+						+ Nautilus.getSourceDirectory()),
+				FileUtils.getClassPathsWithPackage(xml));
+
+		if (mainClass != null) {
+
+			manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS,
+					mainClass);
+
+		} else {
+
+			LoggingUtils.DEFAULT_LOGGER
+					.warn("The automated main class finder was unable to locate a main class!  If this is expected, you may ignore this message.");
+		}
+
+		return manifest;
+	}
+
 	public static void generateSource(ProjectXML xml, String... args) {
 
 	}
@@ -255,7 +358,8 @@ public class NautilusBuilder {
 
 		LoggingUtils.DEFAULT_LOGGER.info("Cleaning up build environment...");
 
-		File buildTempFolder = new File(Nautilus.getNautilusDirectory()
+		File buildTempFolder = new File(Nautilus.getProjectDirectory()
+				+ Nautilus.getNautilusDirectory()
 				+ Nautilus.getTempBuildDirectory());
 
 		if (buildTempFolder.exists()) {

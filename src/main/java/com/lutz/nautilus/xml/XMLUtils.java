@@ -11,6 +11,7 @@ import main.java.com.lutz.nautilus.loggers.LoggingUtils;
 import main.java.com.lutz.nautilus.settings.ProjectSettings;
 import main.java.com.lutz.nautilus.settings.SettingsEntry;
 import main.java.com.lutz.nautilus.xml.data.ClassEntry;
+import main.java.com.lutz.nautilus.xml.data.DependencyEntry;
 import main.java.com.lutz.nautilus.xml.data.FileEntry;
 import main.java.com.lutz.nautilus.xml.data.ModelEntry;
 import main.java.com.lutz.nautilus.xml.data.PackageEntry;
@@ -29,14 +30,14 @@ public class XMLUtils {
 
 		ProjectSettings settings = new ProjectSettings();
 
-		String name, id, version, mainClass = null;
+		String name, id, version;
 
 		XMLParser parser = new XMLParser();
 
 		if (new File(Nautilus.getProjectXMLFilename()).exists()) {
 
 			XMLTree tree = parser.parseXML(new File(Nautilus
-					.getProjectXMLFilename()));
+					.getProjectDirectory() + Nautilus.getProjectXMLFilename()));
 
 			XMLTag root = tree.getRoot();
 
@@ -84,22 +85,25 @@ public class XMLUtils {
 				}
 			}
 
+			if (root.hasChild("dependencies")) {
+
+				XMLTag[] dependencies = root.getChild("dependencies")
+						.getChildrenForName("dependency");
+
+				for (XMLTag dependency : dependencies) {
+
+					if (dependency.getValue() != null) {
+
+						model.addDependencyEntry(new DependencyEntry(dependency
+								.getValue()));
+					}
+				}
+			}
+
 			if (root.hasChild("class-registry")) {
 
 				XMLTag[] classList = root.getChild("class-registry")
 						.getChildrenForName("class");
-
-				if (root.getChild("class-registry").hasChild("main-class")) {
-
-					mainClass = root.getChild("class-registry")
-							.getChild("main-class").getValue();
-
-				} else {
-
-					mainClass = null;
-				}
-
-				model.setMainClass(mainClass);
 
 				for (XMLTag classEntry : classList) {
 
@@ -207,10 +211,14 @@ public class XMLUtils {
 
 		LoggingUtils.DEFAULT_LOGGER.info("Building project model...");
 
-		if (new File(Nautilus.getSourceDirectory()).exists()) {
+		if (new File(Nautilus.getProjectDirectory()
+				+ Nautilus.getSourceDirectory()).exists()) {
 
-			sortClassModel(new File(Nautilus.getSourceDirectory()), new File(
-					Nautilus.getSourceDirectory()).listFiles(), null, model);
+			sortClassModel(
+					new File(Nautilus.getProjectDirectory()
+							+ Nautilus.getSourceDirectory()),
+					new File(Nautilus.getSourceDirectory()).listFiles(), null,
+					model);
 		}
 
 		LoggingUtils.DEFAULT_LOGGER
@@ -318,15 +326,6 @@ public class XMLUtils {
 
 			XMLTag classRegistry = new XMLTag("class-registry");
 
-			XMLTag mainClass = new XMLTag("main-class");
-
-			if (xml.getProjectModel().getMainClass() != null) {
-
-				mainClass.setValue(xml.getProjectModel().getMainClass());
-
-				classRegistry.addChild(mainClass);
-			}
-
 			fillClassRegistryTag(xml.getProjectModel().getEntries(), null,
 					classRegistry);
 
@@ -347,8 +346,8 @@ public class XMLUtils {
 			LoggingUtils.DEFAULT_LOGGER.info("Writing ProjectXML data to "
 					+ Nautilus.getProjectXMLFilename() + "...");
 
-			XMLWriter
-					.writeXML(new File(Nautilus.getProjectXMLFilename()), tree);
+			XMLWriter.writeXML(new File(Nautilus.getProjectDirectory()
+					+ Nautilus.getProjectXMLFilename()), tree);
 		}
 
 		return xml;
@@ -433,5 +432,54 @@ public class XMLUtils {
 
 			fileRegistry.addChild(file);
 		}
+	}
+
+	public static ProjectXML updateFileReferences() {
+
+		LoggingUtils.DEFAULT_LOGGER
+				.log("Updating project.xml file references...");
+
+		ProjectXML xml = generateProjectXML("null", "null", "-1");
+
+		if (xml != null) {
+
+			if (new File(Nautilus.getProjectDirectory()
+					+ Nautilus.getProjectXMLFilename()).exists()) {
+
+				XMLTree tree = new XMLParser().parseXML(new File(Nautilus
+						.getProjectDirectory()
+						+ Nautilus.getProjectXMLFilename()));
+
+				if (tree.getRoot().hasChild("class-registry")) {
+
+					XMLTag classRegistry = tree.getRoot().getChild(
+							"class-registry");
+					
+					classRegistry.clearChildren();
+
+					fillClassRegistryTag(xml.getProjectModel().getEntries(),
+							null, classRegistry);
+				}
+
+				if (tree.getRoot().hasChild("file-registry")) {
+
+					XMLTag fileRegistry = tree.getRoot().getChild(
+							"file-registry");
+					
+					fileRegistry.clearChildren();
+
+					fillFileRegistryTag(xml.getProjectModel().getFileEntries(),
+							fileRegistry);
+				}
+
+				LoggingUtils.DEFAULT_LOGGER.info("Writing ProjectXML data to "
+						+ Nautilus.getProjectXMLFilename() + "...");
+
+				XMLWriter.writeXML(new File(Nautilus.getProjectDirectory()
+						+ Nautilus.getProjectXMLFilename()), tree);
+			}
+		}
+
+		return parseProjectXML();
 	}
 }

@@ -2,7 +2,9 @@
 ## Custom
 #################
 
-
+.nautilus/
+.nautilus/builds/Nautilus-1.0.jar
+*.build
 
 #################
 ## Eclipse
