@@ -33,7 +33,7 @@ public class Nautilus {
 
 	private static final String PROJECT_XML_FILENAME = "project.xml";
 
-	private static final String PROJECT_BUILD_FILENAME = "project.build";
+	private static final String PROJECT_BUILD_FILENAME = "build.xml";
 
 	public static void main(String[] args) throws UnsupportedEncodingException {
 		
