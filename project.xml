@@ -3,40 +3,61 @@
 	<name>Nautilus</name>
 	<id>nautilus</id>
 	<version>1.0</version>
+	<developer>LutzBlox</developer>
+	<description>Nautilus is a build tool for Java.</description>
+	<distribution>
+		<name>${name}</name>
+		<src-name>${dist-name}-src</src-name>
+	</distribution>
 	<settings>
-		<setting name="buildsrc" value="true" />
 		<setting name="leaveprojxml" value="true" />
 		<setting name="logactions" value="true" />
-		<setting name="jrev" value="1.7" />
 	</settings>
 	<dependencies>
-		<dependency>C:\Users\Krealutz\Desktop\Java\Build Tool\Nautilus-BuildTool\libs\easyxml.jar</dependency>
+		<dependency package-method="internal">C:/Users/Krealutz/Desktop/Java/Build Tool/Nautilus-BuildTool/libs/easyxml.jar</dependency>
 	</dependencies>
 	<class-registry>
-		<class>main.java.com.lutz.nautilus.builders.BuildPhase</class>
-		<class>main.java.com.lutz.nautilus.builders.BuildUtils</class>
-		<class>main.java.com.lutz.nautilus.builders.NautilusBuilder</class>
-		<class>main.java.com.lutz.nautilus.io.FileUtils</class>
-		<class>main.java.com.lutz.nautilus.loggers.BoundLogger</class>
-		<class>main.java.com.lutz.nautilus.loggers.ClockType</class>
-		<class>main.java.com.lutz.nautilus.loggers.Level</class>
-		<class>main.java.com.lutz.nautilus.loggers.Logger</class>
-		<class>main.java.com.lutz.nautilus.loggers.LoggingUtils</class>
-		<class>main.java.com.lutz.nautilus.loggers.Timestamp</class>
-		<class>main.java.com.lutz.nautilus.loggers.Verbosity</class>
-		<class>main.java.com.lutz.nautilus.Nautilus</class>
-		<class>main.java.com.lutz.nautilus.settings.ProjectSettings</class>
-		<class>main.java.com.lutz.nautilus.settings.SettingsEntry</class>
-		<class>main.java.com.lutz.nautilus.settings.SettingsHelper</class>
-		<class>main.java.com.lutz.nautilus.xml.data.ClassEntry</class>
-		<class>main.java.com.lutz.nautilus.xml.data.DependencyEntry</class>
-		<class>main.java.com.lutz.nautilus.xml.data.DependencyPackageType</class>
-		<class>main.java.com.lutz.nautilus.xml.data.FileEntry</class>
-		<class>main.java.com.lutz.nautilus.xml.data.ModelEntry</class>
-		<class>main.java.com.lutz.nautilus.xml.data.PackageEntry</class>
-		<class>main.java.com.lutz.nautilus.xml.data.ProjectModel</class>
-		<class>main.java.com.lutz.nautilus.xml.ProjectXML</class>
-		<class>main.java.com.lutz.nautilus.xml.XMLUtils</class>
+		<class>com.lutz.nautilus.builders.BuildUtils</class>
+		<class>com.lutz.nautilus.builders.exceptions.BuildException</class>
+		<class>com.lutz.nautilus.builders.NautilusBuilder</class>
+		<class>com.lutz.nautilus.builders.Phase</class>
+		<class>com.lutz.nautilus.builders.script.BuildScript</class>
+		<class>com.lutz.nautilus.builders.script.BuildValues</class>
+		<class>com.lutz.nautilus.builders.script.ScriptUtils</class>
+		<class>com.lutz.nautilus.cli.ArrayHelper</class>
+		<class>com.lutz.nautilus.cli.CLIResponse</class>
+		<class>com.lutz.nautilus.cli.commands.builtin.Build</class>
+		<class>com.lutz.nautilus.cli.commands.builtin.Help</class>
+		<class>com.lutz.nautilus.cli.commands.builtin.Info</class>
+		<class>com.lutz.nautilus.cli.commands.builtin.Setup</class>
+		<class>com.lutz.nautilus.cli.commands.builtin.Update</class>
+		<class>com.lutz.nautilus.cli.commands.Command</class>
+		<class>com.lutz.nautilus.cli.commands.Flag</class>
+		<class>com.lutz.nautilus.cli.commands.FlagList</class>
+		<class>com.lutz.nautilus.cli.HelpFormatter</class>
+		<class>com.lutz.nautilus.cli.NautilusCLI</class>
+		<class>com.lutz.nautilus.io.FileUtils</class>
+		<class>com.lutz.nautilus.loggers.BoundLogger</class>
+		<class>com.lutz.nautilus.loggers.ClockType</class>
+		<class>com.lutz.nautilus.loggers.Level</class>
+		<class>com.lutz.nautilus.loggers.Logger</class>
+		<class>com.lutz.nautilus.loggers.LoggingUtils</class>
+		<class>com.lutz.nautilus.loggers.Timestamp</class>
+		<class>com.lutz.nautilus.loggers.Verbosity</class>
+		<class>com.lutz.nautilus.Nautilus</class>
+		<class>com.lutz.nautilus.settings.ProjectSettings</class>
+		<class>com.lutz.nautilus.settings.SettingsEntry</class>
+		<class>com.lutz.nautilus.settings.SettingsHelper</class>
+		<class>com.lutz.nautilus.Test</class>
+		<class>com.lutz.nautilus.xml.data.ClassEntry</class>
+		<class>com.lutz.nautilus.xml.data.DependencyEntry</class>
+		<class>com.lutz.nautilus.xml.data.DependencyPackageType</class>
+		<class>com.lutz.nautilus.xml.data.FileEntry</class>
+		<class>com.lutz.nautilus.xml.data.ModelEntry</class>
+		<class>com.lutz.nautilus.xml.data.PackageEntry</class>
+		<class>com.lutz.nautilus.xml.data.ProjectModel</class>
+		<class>com.lutz.nautilus.xml.ProjectXML</class>
+		<class>com.lutz.nautilus.xml.XMLUtils</class>
 	</class-registry>
 	<file-registry />
 </project>

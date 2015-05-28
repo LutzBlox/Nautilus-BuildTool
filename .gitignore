@@ -2,9 +2,8 @@
 ## Custom
 #################
 
-.nautilus/
-.nautilus/builds/Nautilus-1.0.jar
-*.build
+install-dir/nautilus-jdk/
+install-dir/nautilus-legacy.*
 
 #################
 ## Eclipse
